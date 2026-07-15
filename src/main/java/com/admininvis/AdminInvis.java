@@ -4,6 +4,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.CombatTracker;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import org.slf4j.Logger;
@@ -31,7 +32,9 @@ public class AdminInvis implements ModInitializer {
 			}
 		});
 
-		LOGGER.info("AdminInvis initialized");
+		// Loading the class here forces the death-message mixin to apply now, so a broken injection
+		// crashes loudly at startup instead of failing silently on the first kill.
+		LOGGER.info("AdminInvis initialized, death-message anonymizer hooked into {}", CombatTracker.class.getSimpleName());
 	}
 
 	/** Infinite duration, no particles, but with the HUD icon so the admin can tell it's on. */
