@@ -20,8 +20,9 @@ import java.util.Set;
 /**
  * Every player death message (chat broadcast and the victim's death screen) is built here. Rather
  * than guessing which message variant credits the killer, the finished message is scanned for the
- * name of any online player who is currently invisible - by /invis, potion, or anything else - and
- * that name is shown as "Unknown". The victim's own name is never hidden.
+ * name of any online player who is currently invisible - by /invis, potion, or anything else. If
+ * one appears, the whole message is swapped for "Victim was slain by Unknown", hiding the killer's
+ * name and their weapon/method. The victim's own name is never hidden.
  */
 @Mixin(CombatTracker.class)
 public abstract class CombatTrackerMixin {
@@ -48,8 +49,9 @@ public abstract class CombatTrackerMixin {
 			return;
 		}
 
-		Component replaced = DeathMessageAnonymizer.replaceNames(message, hiddenNames);
-		if (replaced != message) {
+		if (DeathMessageAnonymizer.mentionsAny(message, hiddenNames)) {
+			// "death.attack.player" is vanilla's "%1$s was slain by %2$s"
+			Component replaced = Component.translatable("death.attack.player", this.mob.getDisplayName(), Component.literal("Unknown"));
 			AdminInvis.LOGGER.info("Hid an invisible player's name in a death message: {}", replaced.getString());
 			cir.setReturnValue(replaced);
 		}
