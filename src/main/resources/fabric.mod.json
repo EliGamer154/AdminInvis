@@ -1,0 +1,26 @@
+{
+	"schemaVersion": 1,
+	"id": "admininvis",
+	"version": "${version}",
+	"name": "AdminInvis",
+	"description": "Adds /invis for admins: permanent invisibility that survives totems, milk and death, and hides your name from death messages while active.",
+	"authors": [
+		"EliGamer154"
+	],
+	"license": "MIT",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.admininvis.AdminInvis"
+		]
+	},
+	"mixins": [
+		"admininvis.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.19.3",
+		"minecraft": ">=26.1.2 <=26.2",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}
