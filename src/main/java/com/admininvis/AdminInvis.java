@@ -18,8 +18,9 @@ public class AdminInvis implements ModInitializer {
 	public void onInitialize() {
 		CommandRegistrationCallback.EVENT.register((dispatcher, buildContext, selection) -> InvisCommand.register(dispatcher));
 
-		// Anything that strips effects - totem of undying, milk, /effect clear, dying - only wins for a
-		// single tick: as long as the toggle is on, the invisibility effect is put straight back.
+		// Safety net: LivingEntityMixin re-adds invisibility inside the removal call itself (no visible
+		// gap), and this tick handler catches everything else - respawning after death, relogging, or
+		// an effect expiring - so the toggle always wins eventually.
 		ServerTickEvents.END_SERVER_TICK.register(server -> {
 			InvisState state = InvisState.get(server);
 			if (state.isEmpty()) {
@@ -32,9 +33,10 @@ public class AdminInvis implements ModInitializer {
 			}
 		});
 
-		// Loading the class here forces the death-message mixin to apply now, so a broken injection
-		// crashes loudly at startup instead of failing silently on the first kill.
-		LOGGER.info("AdminInvis initialized, death-message anonymizer hooked into {}", CombatTracker.class.getSimpleName());
+		// Loading the classes here forces both mixins to apply now, so a broken injection crashes
+		// loudly at startup instead of failing silently on the first kill or totem pop.
+		LOGGER.info("AdminInvis initialized, hooked into {} and {}",
+				CombatTracker.class.getSimpleName(), net.minecraft.world.entity.LivingEntity.class.getSimpleName());
 	}
 
 	/** Infinite duration, no particles, but with the HUD icon so the admin can tell it's on. */
